@@ -1,4 +1,4 @@
-from functools import cache
+from django.core.cache import cache
 import shutil
 import tempfile
 from tokenize import Comment
