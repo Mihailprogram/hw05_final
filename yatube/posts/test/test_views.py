@@ -170,17 +170,22 @@ class PostPagesTests(TestCase):
                 self.assertNotIn(expected, page)
 
     def test_index_page_caches_posts(self):
-        cache.clear()
-        response = self.authorized_client.get(reverse('posts:index'))
-        Post.objects.create(
-            text='Текст тестового поста',
+        post_text = 'cached_index_page_post'
+        post = Post.objects.create(
+            text=post_text,
             author=self.user
         )
-        response_2 = self.authorized_client.get(reverse('posts:index'))
-        self.assertEqual(response.content, response_2.content)
+
+        response_before_post_delete = self.client.get(reverse('posts:index'))
+        post.delete()
+        response_before_clear_cache = self.client.get(reverse('posts:index'))
         cache.clear()
-        response_3 = self.authorized_client.get(reverse('posts:index'))
-        self.assertNotEqual(response_2.content, response_3.content)
+        response_after_clear_cache = self.client.get(reverse('posts:index'))
+
+        self.assertIn(post_text, str(response_before_post_delete.content))
+        self.assertNotIn(post_text, str(response_after_clear_cache.content))
+        self.assertNotEqual(response_before_clear_cache,
+                            response_after_clear_cache)
 
     def test_auth_user_can_follow(self):
         """Работают ли подписки"""
