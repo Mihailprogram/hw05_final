@@ -4,17 +4,8 @@ from .models import Follow, Post, Group, Comment, User
 from django.core.paginator import Paginator
 from django.shortcuts import render
 from .forms import PostForm, CommentForm
-from django.views.decorators.cache import cache_page
 
 
-def paginator(request, posts):
-    paginator = Paginator(posts, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    return page_obj
-
-
-@cache_page(20 * 1)
 def index(request):
     post_list = Post.objects.all().order_by('-pub_date')
     paginator = Paginator(post_list, 10)
