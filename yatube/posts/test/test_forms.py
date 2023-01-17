@@ -45,6 +45,7 @@ class PostCreateFormTests(TestCase):
     def setUp(self):
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
+        self.guest_client = Client()
 
     def test_create_post(self):
         """Валидная форма создает запись в Post."""

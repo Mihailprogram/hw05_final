@@ -5,13 +5,14 @@ from django.core.paginator import Paginator
 from django.shortcuts import render
 from .forms import PostForm, CommentForm
 from django.views.decorators.cache import cache_page
-from django.conf import settings
+
 
 def paginator(request, posts):
     paginator = Paginator(posts, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     return page_obj
+
 
 @cache_page(20 * 1)
 def index(request):
@@ -141,7 +142,7 @@ def follow_index(request):
     # информация о текущем пользователе доступна в переменной request.user
     posts = Post.objects.select_related('author', 'group').filter(
         author__following__user=request.user
-        )
+    )
     paginator = Paginator(posts, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -156,9 +157,10 @@ def follow_index(request):
 def profile_follow(request, username):
     # Подписаться на автора
     author = User.objects.get(username=username)
-    if request.user!=author:
+    if request.user != author:
         Follow.objects.get_or_create(user=request.user, author=author)
     return redirect("posts:profile", username=author)
+
 
 @login_required
 def profile_unfollow(request, username):
