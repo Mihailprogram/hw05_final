@@ -479,7 +479,6 @@ class CommentTest(TestCase):
     def test_post_detail_page_show_correct_context(self):
         """Шаблон post_detail сформирован с
            правильным контекстом комментария."""
-        
         response = self.authorized_client.get(
             reverse('posts:post_detail', kwargs={'post_id': self.post.id}))
         comments = {response.context['comments'][0].text: 'Тестовый коммент',
