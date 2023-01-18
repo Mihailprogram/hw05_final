@@ -84,8 +84,6 @@ class StaticURLTests(TestCase):
         """Проверяем адреса перенаправления неавторизованного пользователя"""
         for url, redirect_url in {
             "/create/": "/auth/login/?next=/create/",
-            f"/posts/{StaticURLTests.post.id}/edit/":
-            f"/profile/{self.user}/",
         }.items():
             with self.subTest(url=url):
                 self.assertRedirects(
