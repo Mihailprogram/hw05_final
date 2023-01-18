@@ -1,13 +1,14 @@
-from django.core.cache import cache
 import shutil
 import tempfile
+
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django import forms
 from django.conf import settings
 from posts.forms import PostForm
-
+from django.core.cache import cache
 
 from ..models import Follow, Post, Group, Comment
 
@@ -326,12 +327,26 @@ class PostImageViewsTest(TestCase):
             slug='test_slug',
             description='Описание тестовой группы',
         )
+        small_gif = (
+            b'\x47\x49\x46\x38\x39\x61\x02\x00'
+            b'\x01\x00\x80\x00\x00\x00\x00\x00'
+            b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
+            b'\x00\x00\x00\x2C\x00\x00\x00\x00'
+            b'\x02\x00\x01\x00\x00\x02\x02\x0C'
+            b'\x0A\x00\x3B'
+        )
+        cls.image = SimpleUploadedFile(
+            name='small.gif',
+            content=small_gif,
+            content_type='image/gif'
+        )
         cls.user = User.objects.create_user(username='Test_user')
         cls.post = Post.objects.create(
             author=cls.user,
             text='Тестовый текст',
             group=cls.group,
-            pub_date='2022-08-23 9-00-00'
+            pub_date='2022-08-23 9-00-00',
+            image=cls.image
         )
 
     def setUp(self):
@@ -445,23 +460,26 @@ class CommentTest(TestCase):
         super().setUpClass()
         cls.user = User.objects.create_user(username='auth1')
         cls.user2 = User.objects.create_user(username='auth2')
+        cls.group = Group.objects.create(title='Тестовая группа',
+                                         slug='test_group')
+        cls.post = Post.objects.create(
+            text='Тестовый текст',
+            group=cls.group,
+            author=cls.user)
+        cls.comment = Comment.objects.create(
+            post_id=cls.post.id,
+            author=cls.user,
+            text='Тестовый коммент')
 
     def setUp(self):
         self.guest_client = Client()
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
-        self.group = Group.objects.create(title='Тестовая группа',
-                                          slug='test_group')
-        self.post = Post.objects.create(text='Тестовый текст',
-                                        group=self.group,
-                                        author=self.user)
 
     def test_post_detail_page_show_correct_context(self):
         """Шаблон post_detail сформирован с
            правильным контекстом комментария."""
-        self.comment = Comment.objects.create(post_id=self.post.id,
-                                              author=self.user,
-                                              text='Тестовый коммент')
+        
         response = self.authorized_client.get(
             reverse('posts:post_detail', kwargs={'post_id': self.post.id}))
         comments = {response.context['comments'][0].text: 'Тестовый коммент',

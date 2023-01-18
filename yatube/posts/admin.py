@@ -13,7 +13,6 @@ class PostAdmin(admin.ModelAdmin):
 
 
 class GroupAdmin(admin.ModelAdmin):
-
     list_display = ('title', 'slug',)
 
 

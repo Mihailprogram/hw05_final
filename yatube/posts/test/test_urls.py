@@ -10,8 +10,6 @@ class StaticURLTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-
-        # Создадим запись в БД для проверки доступности адреса task/test-slug/
         cls.user = User.objects.create_user(username='Miha')
         cls.group = Group.objects.create(
             title='Тестовое название группы',
