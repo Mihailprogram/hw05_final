@@ -96,7 +96,7 @@ class PostCreateFormTests(TestCase):
             reverse('posts:post_detail', kwargs={'post_id': self.post.id})
         )
         # Проверяем, что число постов не увеличилось
-        self.assertEqual(Post.objects.count(), posts_count)
+        self.assertEqual(Post.objects.co unt(), posts_count)
         # Проверяем, что запись изменилась
         last_post = Post.objects.get(id=self.post.id)
         self.assertEqual(last_post.author.username, form_data['author'])
