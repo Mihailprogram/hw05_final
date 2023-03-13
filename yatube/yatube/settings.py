@@ -71,10 +71,6 @@ MIDDLEWARE = [
 INTERNAL_IPS = [
     '127.0.0.1',
 ] 
-ALLOWED_HOSTS = [
-    'www.thebestweb.pythonanywhere.com',
-    'thebestweb.pythonanywhere.com',
-] 
 
 ROOT_URLCONF = 'yatube.urls'
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)

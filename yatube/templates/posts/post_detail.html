@@ -38,7 +38,10 @@
           {%if post.author == request.user%}
           <a class="btn btn-primary" href={% url 'posts:post_edit' post.id %} >
             редактировать запись
-          </a>  
+          </a> 
+          <a class="btn btn-primary" href={%url 'posts:del' post.id%}>
+            Удалить запись
+          </a>   
           {% endif %}
         {% if user.is_authenticated %}
         <div class="card my-4">

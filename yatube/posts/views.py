@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 
 from .models import Follow, Post, Group, Comment, User
-from .forms import PostForm, CommentForm
+from .forms import GroupForm, PostForm, CommentForm
 
 
 def index(request):
@@ -67,6 +67,27 @@ def post_detail(request, post_id):
 
 
 @login_required
+def creat_group(request):
+    form = GroupForm()
+    if request.method == 'POST':
+        form = GroupForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('posts:index')
+    context = {
+        'form': form,
+    }
+    return render(request, 'posts/group.html', context)
+
+
+@login_required
+def delet_post(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+    name = Post.objects.filter(pk=post_id)
+    name.delete()
+    return redirect('posts:profile', post.author)
+
+@login_required
 def post_create(request):
     template = "posts/create_post.html"
     is_edit = False
@@ -121,6 +142,7 @@ def add_comment(request, post_id):
         comment.author = request.user
         comment.post = post
         comment.save()
+        
     return redirect('posts:post_detail', post_id=post_id)
 
 
