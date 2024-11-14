@@ -11,24 +11,70 @@
           <article>
             <ul>
               <li>
-                Автор: {{ post.author.get_full_name }} <a href="{% url "posts:profile" post.author %}">все посты пользователя</a>
+                Автор: {{ post.author.username }} <a href="{% url "posts:profile" post.author %}">все посты пользователя</a>
               </li>
               <li>
                 Дата публикации: {{ post.pub_date|date:"d E Y" }}
+                {{post.date}}
               </li>
             </ul>    
-            {% thumbnail post.image "800x200" crop="center" upscale=True as im %}
-            <img class="card-img my-2" src="{{ im.url }}">
-            {% endthumbnail %}  
             <p>{{ post.text }}</p>
+            {% if post.image%}
+            <img src="media/{{post.image}}" class="card-img-top"  style="width: 18rem;">
+          {%else%}
+          <img src="media/posts/default.png" class="card-img-top"  style="width: 18rem;">
+
+          {%endif%}
             {% if post.group %}
               <a href={% url 'posts:group_list' post.group.slug %}>все записи группы</a>
             {% endif %}
           </article>
           {% if not forloop.last %}<hr>{% endif %}
+          {% if user.is_authenticated %}
+          <div class="likes">
+            <span  class="like-icon" id="likeButton">♡</span>
+            <br>
+            <p id="count">{{ post.count_likes }}</p>
+          </div>
+          {% endif %}
+          <script>
+             const likeButton = document.getElementById('likeButton');
+        const countDisplay = document.getElementById('count');
+
+        likeButton.addEventListener('click', function() {
+            // Toggle the "liked" state of the button
+            likeButton.classList.toggle('liked');
+            
+            // Determine if we are adding or removing a like
+            const isLiked = likeButton.classList.contains('liked');
+            const url = `/like/{{ post.id }}/`;
+
+            // Update the count displayed based on like/unlike action
+            let currentCount = parseInt(countDisplay.textContent);
+            countDisplay.textContent = isLiked ? currentCount + 1 : currentCount - 1;
+
+            // Send a request to update like status on the server
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+                
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                // Revert the count in case of an error
+                countDisplay.textContent = isLiked ? currentCount - 1 : currentCount + 1;
+                likeButton.classList.toggle('liked'); // Revert the "liked" state
+            });
+        });
+   
+
+        </script>
         {% endfor %}
         {% include 'includes/paginator.html' %}
         
       </div>  
+     
 {% endblock  %}
-{% endcache %} 
+{% endcache %}

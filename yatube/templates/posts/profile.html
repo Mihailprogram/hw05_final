@@ -21,9 +21,6 @@
       </a>
    {% endif %}
         <br></br>
-        <li class="list-group-item">
-          <a href="{% url "posts:profile" author.username %}">все посты пользователя</a> 
-        </li>
         {% for post in page_obj %}  
         <article>
           <ul>

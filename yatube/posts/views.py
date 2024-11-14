@@ -2,8 +2,14 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 
-from .models import Follow, Post, Group, Comment, User
+from .models import Follow, Post, Group, Comment, User, Like
 from .forms import GroupForm, PostForm, CommentForm
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+
+
+def user_in_group(user):
+    return user.groups.filter(name='all').exists()
 
 
 def index(request):
@@ -16,6 +22,22 @@ def index(request):
         'page_obj': page_obj,
     }
     return render(request, 'posts/index.html', context)
+
+
+@login_required
+def like(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+    like = Like.objects.filter(post=post, user=request.user)
+    if like.exists():
+        post.count_likes -= 1
+        post.save()
+        like.delete()
+    else:
+        post.count_likes += 1
+        post.save()
+        Like.objects.create(post=post, user=request.user)
+    
+    return redirect('posts:index')
 
 
 def group_posts(request, slug):
@@ -88,6 +110,7 @@ def delet_post(request, post_id):
     return redirect('posts:profile', post.author)
 
 @login_required
+# @user_passes_test(user_in_group)
 def post_create(request):
     template = "posts/create_post.html"
     is_edit = False

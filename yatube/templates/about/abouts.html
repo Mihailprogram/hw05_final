@@ -1,10 +1,52 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %}{% endblock %}
-<title>Обо мне</title>
+{% block title %}Обо мне{% endblock %}
 {% block content %}
-    <h1>Меня зовут Михаил Химач</h1>
-    <img src="{% static 'img/my.jpg' %}" width="500" height="500"  >
 
-<div class="footer">© все права </div>
+<div class="container mt-5">
+    <div class="card mx-auto border-0" style="max-width: 600px;">
+        <div class="card-body text-center">
+            <!-- Аватар пользователя -->
+            {% if user.profile_picture%}
+            <img id="profileImage" class="card-img-top"  style="width: 12rem; height: 12rem; border-radius: 50%; object-fit: cover;">
+          {%else%}
+          <img src="{% static 'default.png' %}" id="profiledef" class="card-img-top"  style="width: 18rem;">
+            <!-- Информация о пользователе -->
+            {%endif%}
+            <h3 class="card-title">{{user.first_name}} {{user.last_name}}</h3>
+            <p class="text-muted">@{{user.username}}</p>
+            
+            <!-- Краткая биография -->
+            <!-- <p class="card-text mt-3">Люблю путешествия, книги и новые технологии. Работаю как веб-разработчик и постоянно учусь новому!</p> -->
+            
+            <!-- Статистика пользователя -->
+            <div class="row mt-4">
+                <div class="col-4">
+                    <h5>Посты</h5>
+                    <p class="text-muted">{{count}}</p>
+                </div>
+                <div class="col-4">
+                    <h5>Подписчики</h5>
+                    <p class="text-muted">{{folower}}</p>
+                </div>
+                <div class="col-4">
+                    <h5>Подписки</h5>
+                    <p class="text-muted">{{folow}}</p>
+                </div>
+            </div>
+            
+            <!-- Кнопка подписки -->
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var profilePictureUrl = "{{ user.profile_picture }}";
+    var cleanUrl = profilePictureUrl.replace('/about/author/', '/'); // Убираем ненужную часть пути
+    document.getElementById("profileImage").src = cleanUrl;
+
+
+
+</script>
+
 {% endblock %}
