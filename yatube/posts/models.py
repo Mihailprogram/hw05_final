@@ -39,7 +39,7 @@ class Post(models.Model):
         upload_to='posts/',
         blank=True
     )
-    count_likes = models.PositiveIntegerField()
+    count_likes = models.PositiveIntegerField(null=True)
 
     def __str__(self):
         return self.text[:15]

@@ -8,8 +8,14 @@
         <div class="card-body text-center">
             <!-- Аватар пользователя -->
             {% if user.profile_picture%}
-            <img id="profileImage" class="card-img-top"  style="width: 12rem; height: 12rem; border-radius: 50%; object-fit: cover;">
+            <img 
+            id="profileImage" 
+            class="card-img-top"  
+            style="width: 12rem; height: 12rem; border-radius: 50%; object-fit: cover;" 
+            src="/about/author/media/{{ user.profile_picture }}" 
+            alt="Profile Picture">
           {%else%}
+        
           <img src="{% static 'default.png' %}" id="profiledef" class="card-img-top"  style="width: 18rem;">
             <!-- Информация о пользователе -->
             {%endif%}
@@ -41,10 +47,14 @@
 </div>
 
 <script type="text/javascript">
-    var profilePictureUrl = "{{ user.profile_picture }}";
-    var cleanUrl = profilePictureUrl.replace('/about/author/', '/'); // Убираем ненужную часть пути
-    document.getElementById("profileImage").src = cleanUrl;
+    var profileImageElement = document.getElementById("profileImage");
+var profilePictureUrl = profileImageElement.src;
 
+// Убираем лишнюю часть пути
+var cleanUrl = profilePictureUrl.replace('/about/author/', '/');
+
+// Устанавливаем очищенный URL обратно
+profileImageElement.src = cleanUrl;
 
 
 </script>

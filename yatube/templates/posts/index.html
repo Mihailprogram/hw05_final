@@ -29,29 +29,59 @@
               <a href={% url 'posts:group_list' post.group.slug %}>все записи группы</a>
             {% endif %}
           </article>
-          {% if not forloop.last %}<hr>{% endif %}
           {% if user.is_authenticated %}
           <div class="likes">
-            <span  class="like-icon" id="likeButton">♡</span>
+            <span  class="like-icon" post_id="{{post.id}}" name="likeButton">♡</span>
             <br>
-            <p id="count">{{ post.count_likes }}</p>
+            <p  name="count">{{ post.count_likes }}</p>
+
           </div>
           {% endif %}
-          <script>
-             const likeButton = document.getElementById('likeButton');
-        const countDisplay = document.getElementById('count');
+            <!-- Поля формы -->
+         
+        {% if not forloop.last %}<hr>{% endif %}
 
-        likeButton.addEventListener('click', function() {
+        {% endfor %}
+        {% include 'includes/paginator.html' %}
+        
+      </div>  
+      <script>
+         const likeButtons = document.getElementsByName('likeButton');
+        const countDisplays = document.getElementsByName('count');
+        for (let i = 0; i < likeButtons.length; i++) {
+          const url = `/likeping/${likeButtons[i].getAttribute("post_id")}/`; 
+          
+          fetch(url, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data['message'] == true) {
+                likeButtons[i].classList.toggle('liked');
+              };
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                
+            });
+            
+        
+    }
+    for (let i = 0; i < likeButtons.length; i++) {
+        likeButtons[i].addEventListener('click', function() {
             // Toggle the "liked" state of the button
-            likeButton.classList.toggle('liked');
+            this.classList.toggle('liked'); // Используем "this" для текущего элемента нажатия
             
             // Determine if we are adding or removing a like
-            const isLiked = likeButton.classList.contains('liked');
-            const url = `/like/{{ post.id }}/`;
+            const isLiked = this.classList.contains('liked');
+            const url = `/like/${likeButtons[i].getAttribute("post_id")}/`; // Обратите внимание, что {{ post.id }} должен быть доступен для каждой "лайк-кнопки"
 
             // Update the count displayed based on like/unlike action
-            let currentCount = parseInt(countDisplay.textContent);
-            countDisplay.textContent = isLiked ? currentCount + 1 : currentCount - 1;
+            let currentCount = parseInt(countDisplays[i].textContent); // Используем индекс для соответствующего count
+            countDisplays[i].textContent = isLiked ? currentCount + 1 : currentCount - 1;
 
             // Send a request to update like status on the server
             fetch(url, {
@@ -59,22 +89,16 @@
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
                 }
-                
             })
             .catch((error) => {
                 console.error('Error:', error);
                 // Revert the count in case of an error
-                countDisplay.textContent = isLiked ? currentCount - 1 : currentCount + 1;
-                likeButton.classList.toggle('liked'); // Revert the "liked" state
+                countDisplays[i].textContent = isLiked ? currentCount - 1 : currentCount + 1; 
+                this.classList.toggle('liked'); // Revert the "liked" state
             });
         });
-   
-
-        </script>
-        {% endfor %}
-        {% include 'includes/paginator.html' %}
-        
-      </div>  
-     
+    }
+  
+   </script>
 {% endblock  %}
 {% endcache %}

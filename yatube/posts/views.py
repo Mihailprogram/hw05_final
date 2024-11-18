@@ -4,9 +4,8 @@ from django.core.paginator import Paginator
 
 from .models import Follow, Post, Group, Comment, User, Like
 from .forms import GroupForm, PostForm, CommentForm
-from channels.layers import get_channel_layer
-from asgiref.sync import async_to_sync
-
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 def user_in_group(user):
     return user.groups.filter(name='all').exists()
@@ -15,13 +14,24 @@ def user_in_group(user):
 def index(request):
     post_list = Post.objects.all().order_by('-pub_date')
     paginator = Paginator(post_list, 10)
-
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     context = {
         'page_obj': page_obj,
     }
     return render(request, 'posts/index.html', context)
+
+@api_view(['GET'])
+def ping_like(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+    
+    like = Like.objects.filter(post=post, user=request.user)
+    print(like)
+    if like.exists():
+        return Response({'message': True})
+    else:
+        return Response({'message': False})
+
 
 
 @login_required
@@ -36,7 +46,7 @@ def like(request, post_id):
         post.count_likes += 1
         post.save()
         Like.objects.create(post=post, user=request.user)
-    
+
     return redirect('posts:index')
 
 
@@ -124,6 +134,7 @@ def post_create(request):
     if form.is_valid():
         post = form.save(commit=False)
         post.author = request.user
+        post.count_likes = 0
         post.save()
         return redirect("posts:profile", request.user)
     context = {"form": form, "is_edit": is_edit}

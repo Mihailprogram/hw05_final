@@ -26,4 +26,6 @@ urlpatterns = [
     ),
     path('posts/<int:post_id>/delet/', views.delet_post, name='del'),
     path('like/<int:post_id>/', views.like, name='like'),
+    path('likeping/<int:post_id>/', views.ping_like, name='like_ping'),
+    
 ]
