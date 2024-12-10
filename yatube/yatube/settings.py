@@ -21,10 +21,9 @@ SECRET_KEY = ')_c=sa)bc8__pc1!*ged=enr@_+sg5iu5=2@c!hzg2f8@im_7u'
 DEBUG = True
 
 ALLOWED_HOSTS = [
+    '87.242.100.29',
     'localhost',
     '127.0.0.1',
-    '[::1]',
-    'testserver',
 ]
 
 MEDIA_URL = '/media/'
@@ -89,13 +88,27 @@ WSGI_APPLICATION = 'yatube.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'postgres',
+#         'USER': 'postgres',
+#         'PASSWORD': '1234',
+#         'HOST': 'localhost',
+#         'PORT': 5432,
+#         'OPTIONS': {
+#             "options": "-c search_path=curs1"
+#         },
+#     }
+# }
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': '1234',
-        'HOST': 'localhost',
+        'NAME': 'dbserv',
+        'USER': 'miha',
+        'PASSWORD': 'miha2003',
+        'HOST': '87.242.100.29',
         'PORT': 5432,
         'OPTIONS': {
             "options": "-c search_path=curs1"
